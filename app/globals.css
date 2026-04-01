@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:         #F2EDE0;
+  --paper:      #F2EDE0;
+  --ink:        #1A1A1A;
+  --ink-muted:  #8A8A8A;
+  --nav-bg:     #F2EDE0;
+  --border-col: #1A1A1A;
+  --btn-dark:   #1A1A1A;
+  --font-mono:  var(--font-courier), "Courier Prime", "Courier New", monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+* { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html, body { overflow-x: hidden; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+}
+
+/* ── Print animation ─────────────────────────── */
+@keyframes printFeed {
+  0%   { clip-path: inset(0 0 100% 0); }
+  100% { clip-path: inset(0 0 0% 0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.print-feed {
+  animation: printFeed 1.6s cubic-bezier(0.1, 0, 0.25, 1) forwards;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Grain noise overlay ─────────────────────── */
+.page-bg {
+  position: relative;
+}
+.page-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Page backgrounds ────────────────────────── */
+
+/* INPUT — misty blue, deep blue blob top-right */
+.bg-input {
+  background:
+    radial-gradient(ellipse 38% 22% at 88% 10%, #3858C4 0%, transparent 65%),
+    radial-gradient(ellipse 65% 55% at 50% -5%, #A8C0E0 0%, transparent 58%),
+    radial-gradient(ellipse 90% 45% at 50% 108%, #FFFFFF 0%, transparent 55%),
+    #BBC8DA;
+}
+
+/* RECEIPT — rose left, teal top-right + bottom-right */
+.bg-receipt {
+  background:
+    radial-gradient(ellipse 55% 48% at 0% 48%, #D8A0BC 0%, transparent 65%),
+    radial-gradient(ellipse 48% 38% at 100% 8%,  #44CCCC 0%, transparent 60%),
+    radial-gradient(ellipse 45% 32% at 78% 100%, #58CCE0 0%, transparent 58%),
+    #CAD8E4;
+}
+
+/* RECEIPTS — light gray base, coral/orange blobs top-right + bottom-left */
+.bg-receipts {
+  background:
+    radial-gradient(ellipse 48% 30% at 75% 6%,  #D85030 0%, transparent 60%),
+    radial-gradient(ellipse 40% 26% at 100% 0%,  #DC6030 0%, transparent 55%),
+    radial-gradient(ellipse 36% 26% at 2%  82%,  #D87030 0%, transparent 55%),
+    radial-gradient(ellipse 30% 20% at 18% 100%, #CC5838 0%, transparent 50%),
+    #EAE6E0;
+}
+
+/* IMPACT — yellow top-left, pink center, lavender, cyan bottom-right */
+.bg-impact {
+  background:
+    radial-gradient(ellipse 50% 40% at 5%  5%,  #FDD080 0%, transparent 65%),
+    radial-gradient(ellipse 55% 50% at 28% 42%, #FCA8C0 0%, transparent 62%),
+    radial-gradient(ellipse 48% 44% at 15% 80%, #C0B4E8 0%, transparent 60%),
+    radial-gradient(ellipse 44% 40% at 85% 92%, #9CE0EC 0%, transparent 60%),
+    #F6F2EE;
 }
