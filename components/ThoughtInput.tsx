@@ -56,7 +56,7 @@ export default function ThoughtInput() {
           backgroundColor: "transparent",
           border: "1px solid rgba(26,26,26,0.4)",
           padding: 14,
-          fontSize: 13,
+          fontSize: 16,
           color: "var(--ink)",
           lineHeight: 1.65,
           resize: "none",
