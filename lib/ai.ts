@@ -47,7 +47,9 @@ export async function rewriteThought(thought: string): Promise<ThoughtAnalysis> 
     ],
   });
 
-  const text = completion.choices[0]?.message?.content ?? "";
-  const parsed = JSON.parse(text.trim()) as ThoughtAnalysis;
+  const raw = completion.choices[0]?.message?.content ?? "";
+  // Strip markdown code fences if model wraps response in ```json ... ```
+  const text = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
+  const parsed = JSON.parse(text) as ThoughtAnalysis;
   return parsed;
 }
