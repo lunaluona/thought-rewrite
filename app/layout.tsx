@@ -25,13 +25,7 @@ export default function RootLayout({
     <html lang="zh">
       <body className={`${courierPrime.variable}`}>
         <DeviceInit />
-        <main
-          style={{
-            maxWidth: "480px",
-            margin: "0 auto",
-            minHeight: "100vh",
-          }}
-        >
+        <main style={{ minHeight: "100vh" }}>
           {children}
         </main>
         <BottomNav />

@@ -20,12 +20,10 @@ export default function BottomNav() {
       right: 0,
       backgroundColor: "var(--nav-bg)",
       height: 56,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-around",
       borderTop: "1px solid rgba(26,26,26,0.15)",
       zIndex: 50,
     }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", height: "100%", display: "flex", alignItems: "center", justifyContent: "space-around" }}>
       {tabs.map((tab) => {
         const isActive = tab.href === "/"
           ? pathname === "/" || pathname === "/rewrite"
@@ -50,6 +48,7 @@ export default function BottomNav() {
           </Link>
         );
       })}
+      </div>
     </nav>
   );
 }
