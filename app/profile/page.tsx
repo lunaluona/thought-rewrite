@@ -1,4 +1,5 @@
 import PagePaper from "@/components/PagePaper";
+import { getDeviceId } from "@/lib/device";
 
 const M: React.CSSProperties = { fontFamily: "var(--font-mono)" };
 
@@ -6,8 +7,10 @@ interface Stats { total: number; streak: number; topEmotion?: string | null; top
 
 async function getStats(): Promise<Stats> {
   try {
+    const userId = await getDeviceId();
+    if (!userId) return { total: 0, streak: 0, topEmotion: null, topBias: null };
     const { getStats } = await import("@/lib/db");
-    return await getStats();
+    return await getStats(userId);
   } catch { return { total: 0, streak: 0, topEmotion: null, topBias: null }; }
 }
 

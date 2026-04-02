@@ -3,13 +3,16 @@ import Link from "next/link";
 import GrowthCard from "@/components/GrowthCard";
 import SaveReceiptButton from "@/components/SaveReceiptButton";
 import PagePaper from "@/components/PagePaper";
+import { getDeviceId } from "@/lib/device";
 
 const M: React.CSSProperties = { fontFamily: "var(--font-mono)" };
 
 async function getThought(id: string) {
   try {
+    const userId = await getDeviceId();
+    if (!userId) return null;
     const { getThoughtById } = await import("@/lib/db");
-    return await getThoughtById(id);
+    return await getThoughtById(id, userId);
   } catch { return null; }
 }
 

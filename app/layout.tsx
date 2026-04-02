@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Courier_Prime } from "next/font/google";
 import BottomNav from "@/components/BottomNav";
+import DeviceInit from "@/components/DeviceInit";
 import "./globals.css";
 
 const courierPrime = Courier_Prime({
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="zh">
       <body className={`${courierPrime.variable}`}>
+        <DeviceInit />
         <main
           style={{
             maxWidth: "480px",

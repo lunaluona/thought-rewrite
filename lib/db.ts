@@ -2,8 +2,6 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL!);
 
-export const MOCK_USER_ID = "00000000-0000-0000-0000-000000000001";
-
 export interface ThoughtRecord {
   id: string;
   user_id: string;
@@ -18,17 +16,9 @@ export interface ThoughtRecord {
 
 export async function initSchema() {
   await sql`
-    CREATE TABLE IF NOT EXISTS users (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      email TEXT,
-      created_at TIMESTAMPTZ DEFAULT now()
-    )
-  `;
-
-  await sql`
     CREATE TABLE IF NOT EXISTS thoughts (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id UUID,
+      user_id TEXT NOT NULL,
       thought_text TEXT,
       emotion TEXT,
       cognitive_bias TEXT,
@@ -38,26 +28,23 @@ export async function initSchema() {
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `;
-
-  await sql`
-    INSERT INTO users (id, email) VALUES
-      ('00000000-0000-0000-0000-000000000001', 'mock@user.com')
-    ON CONFLICT DO NOTHING
-  `;
 }
 
-export async function saveThought(data: {
-  thought_text: string;
-  emotion: string;
-  cognitive_bias: string;
-  reframe_text: string;
-  micro_action: string;
-  reflection_question: string;
-}): Promise<ThoughtRecord> {
+export async function saveThought(
+  userId: string,
+  data: {
+    thought_text: string;
+    emotion: string;
+    cognitive_bias: string;
+    reframe_text: string;
+    micro_action: string;
+    reflection_question: string;
+  }
+): Promise<ThoughtRecord> {
   const rows = await sql`
     INSERT INTO thoughts (user_id, thought_text, emotion, cognitive_bias, reframe_text, micro_action, reflection_question)
     VALUES (
-      ${MOCK_USER_ID},
+      ${userId},
       ${data.thought_text},
       ${data.emotion},
       ${data.cognitive_bias},
@@ -70,41 +57,40 @@ export async function saveThought(data: {
   return rows[0] as ThoughtRecord;
 }
 
-export async function getThoughtById(id: string): Promise<ThoughtRecord | null> {
+export async function getThoughtById(id: string, userId: string): Promise<ThoughtRecord | null> {
   const rows = await sql`
     SELECT * FROM thoughts
-    WHERE id = ${id} AND user_id = ${MOCK_USER_ID}
+    WHERE id = ${id} AND user_id = ${userId}
     LIMIT 1
   `;
   return (rows[0] as ThoughtRecord) ?? null;
 }
 
-export async function getThoughts(): Promise<ThoughtRecord[]> {
+export async function getThoughts(userId: string): Promise<ThoughtRecord[]> {
   const rows = await sql`
     SELECT * FROM thoughts
-    WHERE user_id = ${MOCK_USER_ID}
+    WHERE user_id = ${userId}
     ORDER BY created_at DESC
     LIMIT 20
   `;
   return rows as ThoughtRecord[];
 }
 
-export async function getStats(): Promise<{
+export async function getStats(userId: string): Promise<{
   total: number;
   streak: number;
   topEmotion: string | null;
   topBias: string | null;
 }> {
   const countRows = await sql`
-    SELECT COUNT(*) as total FROM thoughts WHERE user_id = ${MOCK_USER_ID}
+    SELECT COUNT(*) as total FROM thoughts WHERE user_id = ${userId}
   `;
   const total = parseInt(String(countRows[0].total), 10);
 
-  // Streak: count consecutive days from today backwards
   const streakRows = await sql`
     SELECT DISTINCT DATE(created_at) as day
     FROM thoughts
-    WHERE user_id = ${MOCK_USER_ID}
+    WHERE user_id = ${userId}
     ORDER BY day DESC
   `;
 
@@ -124,12 +110,12 @@ export async function getStats(): Promise<{
 
   const emotionRows = await sql`
     SELECT emotion, COUNT(*) as cnt
-    FROM thoughts WHERE user_id = ${MOCK_USER_ID}
+    FROM thoughts WHERE user_id = ${userId}
     GROUP BY emotion ORDER BY cnt DESC LIMIT 1
   `;
   const biasRows = await sql`
     SELECT cognitive_bias, COUNT(*) as cnt
-    FROM thoughts WHERE user_id = ${MOCK_USER_ID}
+    FROM thoughts WHERE user_id = ${userId}
     GROUP BY cognitive_bias ORDER BY cnt DESC LIMIT 1
   `;
 

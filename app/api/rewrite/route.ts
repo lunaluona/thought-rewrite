@@ -1,18 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rewriteThought } from "@/lib/ai";
 import { saveThought } from "@/lib/db";
+import { getDeviceId } from "@/lib/device";
 
 export async function POST(req: NextRequest) {
   try {
-    const { thought } = (await req.json()) as { thought: string };
+    const userId = await getDeviceId();
+    if (!userId) {
+      return NextResponse.json({ error: "Device not identified" }, { status: 400 });
+    }
 
+    const { thought } = (await req.json()) as { thought: string };
     if (!thought || thought.trim().length === 0) {
       return NextResponse.json({ error: "Thought is required" }, { status: 400 });
     }
 
     const analysis = await rewriteThought(thought.trim());
 
-    const record = await saveThought({
+    const record = await saveThought(userId, {
       thought_text: thought.trim(),
       emotion: analysis.emotion,
       cognitive_bias: analysis.cognitive_bias,

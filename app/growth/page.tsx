@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PagePaper from "@/components/PagePaper";
+import { getDeviceId } from "@/lib/device";
 
 const M: React.CSSProperties = { fontFamily: "var(--font-mono)" };
 
@@ -12,8 +13,10 @@ interface ThoughtRecord {
 
 async function getThoughts(): Promise<ThoughtRecord[]> {
   try {
+    const userId = await getDeviceId();
+    if (!userId) return [];
     const { getThoughts } = await import("@/lib/db");
-    return await getThoughts();
+    return await getThoughts(userId);
   } catch { return []; }
 }
 
